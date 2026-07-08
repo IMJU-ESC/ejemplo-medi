@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Catálogo de equipos médicos e insumos hospitalarios en Mazatlán. Ultrasonidos, monitores, material de curación y más.">
+<title>Catálogo | MediPacífico — Equipos Médicos Mazatlán</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Catalog-specific styles */
+  .catalog-hero { padding: 140px 0 60px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); position: relative; overflow: hidden; }
+  .catalog-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,180,216,0.15) 0%, transparent 70%); border-radius: 50%; }
+  .catalog-hero .section-title { color: var(--white); }
+  .catalog-hero .section-subtitle { color: rgba(255,255,255,0.7); }
+
+  .catalog-filters { background: var(--white); padding: 24px 0; border-bottom: 1px solid var(--border); position: sticky; top: var(--header-h); z-index: 100; box-shadow: var(--shadow-sm); }
+  .filters-inner { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .filter-btn {
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: inherit;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+  .filter-search {
+    margin-left: auto;
+    position: relative;
+  }
+  .filter-search input {
+    padding: 10px 16px 10px 40px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-size: 14px;
+    width: 280px;
+    font-family: inherit;
+    transition: var(--transition-fast);
+  }
+  .filter-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,180,216,0.08); }
+  .filter-search::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 48px 0;
+  }
+  .product-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    position: relative;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: transparent;
+  }
+  .product-card.hidden { display: none; }
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .badge-new { background: var(--accent); color: var(--white); }
+  .badge-sale { background: #EF4444; color: var(--white); }
+  .badge-stock { background: #10B981; color: var(--white); }
+  .product-img {
+    height: 200px;
+    background: linear-gradient(135deg, var(--light) 0%, #e0f2fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-body { padding: 20px; }
+  .product-category {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .product-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .product-desc {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .product-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .product-spec {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    color: var(--text-light);
+  }
+  .product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .product-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .product-price .old {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-left: 6px;
+  }
+  .product-cta {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+  .product-cta:hover { background: var(--accent-hover); transform: scale(1.05); }
+
+  .catalog-empty {
+    text-align: center;
+    padding: 80px 20px;
+    display: none;
+  }
+  .catalog-empty.show { display: block; }
+  .catalog-empty-icon { font-size: 64px; margin-bottom: 16px; }
+  .catalog-empty h3 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .catalog-empty p { color: var(--text-light); }
+
+  @media (max-width: 1024px) {
+    .catalog-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .filter-search { width: 100%; margin-left: 0; margin-top: 12px; }
+    .filter-search input { width: 100%; }
+    .filters-inner { flex-direction: column; align-items: stretch; }
+  }
+  @media (max-width: 480px) {
+    .catalog-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div class="preloader">
+  <div class="preloader-logo">⚕</div>
+  <div class="preloader-bar"></div>
+</div>
+
+<!-- Header -->
+<header class="header scrolled">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚕</div>
+      MediPacífico
+    </a>
+    <nav class="nav">
+      <a href="index.html#servicios" class="nav-link">Servicios</a>
+      <a href="catalogo.html" class="nav-link active">Catálogo</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="index.html#contacto" class="nav-link">Contacto</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://wa.me/526698765432" class="header-whatsapp" target="_blank">💬 WhatsApp</a>
+      <button class="mobile-toggle">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- Catalog Hero -->
+<section class="catalog-hero">
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="section-header" style="margin-bottom:0;">
+      <div class="section-label" style="background:rgba(255,255,255,0.1);color:#90E0EF;border:1px solid rgba(255,255,255,0.15);">Catálogo 2026</div>
+      <h2 class="section-title">Equipos médicos e insumos <span style="color:#90E0EF;">disponibles en stock</span></h2>
+      <p class="section-subtitle">Todos nuestros productos cuentan con registro COFEPRIS, garantía extendida y soporte técnico local en Mazatlán.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Filters -->
+<div class="catalog-filters">
+  <div class="container filters-inner">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="diagnostico">Diagnóstico por Imagen</button>
+    <button class="filter-btn" data-filter="monitoreo">Monitoreo</button>
+    <button class="filter-btn" data-filter="uci">UCI / Emergencias</button>
+    <button class="filter-btn" data-filter="insumos">Insumos</button>
+    <button class="filter-btn" data-filter="rehabilitacion">Rehabilitación</button>
+    <div class="filter-search">
+      <input type="text" id="searchInput" placeholder="Buscar producto...">
+    </div>
+  </div>
+</div>
+
+<!-- Catalog Grid -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="catalog-grid" id="catalogGrid">
+
+      <!-- Product 1 -->
+      <div class="product-card" data-category="diagnostico">
+        <span class="product-badge badge-new">Nuevo</span>
+        <div class="product-img">🩺</div>
+        <div class="product-body">
+          <div class="product-category">Diagnóstico por Imagen</div>
+          <div class="product-name">Ultrasonido Portátil Logiq V2</div>
+          <div class="product-desc">Sistema de ultrasonido portátil de alta resolución con doppler color. Ideal para consultorios y servicios de urgencia.</div>
+          <div class="product-specs">
+            <span class="product-spec">15" pantalla</span>
+            <span class="product-spec">4 transductores</span>
+            <span class="product-spec">Batería 3h</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">Desde $245,000</div>
+            <button class="product-cta" onclick="openQuote('Ultrasonido Portátil Logiq V2')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card" data-category="monitoreo">
+        <div class="product-img">📟</div>
+        <div class="product-body">
+          <div class="product-category">Monitoreo</div>
+          <div class="product-name">Monitor de Signos Vitales MX-800</div>
+          <div class="product-desc">Monitor multiparamétrico con pantalla táctil de 15". ECG, SpO2, NIBP, temperatura y respiración en tiempo real.</div>
+          <div class="product-specs">
+            <span class="product-spec">15" táctil</span>
+            <span class="product-spec">5 parámetros</span>
+            <span class="product-spec">WiFi</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$89,500</div>
+            <button class="product-cta" onclick="openQuote('Monitor MX-800')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card" data-category="uci">
+        <span class="product-badge badge-stock">En stock</span>
+        <div class="product-img">🫁</div>
+        <div class="product-body">
+          <div class="product-category">UCI / Emergencias</div>
+          <div class="product-name">Ventilador Mecánico V-500</div>
+          <div class="product-desc">Ventilador de cuidados intensivos con modos invasivos y no invasivos. Interfaz intuitiva y alarmas configurables.</div>
+          <div class="product-specs">
+            <span class="product-spec">Modos VCV/PCV</span>
+            <span class="product-spec">CPAP/BiPAP</span>
+            <span class="product-spec">Batería 4h</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$420,000</div>
+            <button class="product-cta" onclick="openQuote('Ventilador V-500')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product-card" data-category="insumos">
+        <span class="product-badge badge-sale">Mayoreo</span>
+        <div class="product-img">🧤</div>
+        <div class="product-body">
+          <div class="product-category">Insumos</div>
+          <div class="product-name">Guantes de Nitrilo Estériles (Caja 100)</div>
+          <div class="product-desc">Guantes de nitrilo sin polvo, grado médico. Tallas XS a XL. Disponibles por caja o pallet para hospitales.</div>
+          <div class="product-specs">
+            <span class="product-spec">Sin polvo</span>
+            <span class="product-spec">Latex-free</span>
+            <span class="product-spec">ASTM D6319</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$285 <span class="old">$350</span></div>
+            <button class="product-cta" onclick="openQuote('Guantes Nitrilo')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product-card" data-category="diagnostico">
+        <div class="product-img">📷</div>
+        <div class="product-body">
+          <div class="product-category">Diagnóstico por Imagen</div>
+          <div class="product-name">Electrocardiógrafo 12 Canales ECG-1200</div>
+          <div class="product-desc">Electrocardiógrafo digital con interpretación automática. Pantalla de 10", conectividad HL7 y almacenamiento de 500 exámenes.</div>
+          <div class="product-specs">
+            <span class="product-spec">12 derivaciones</span>
+            <span class="product-spec">Interpretación AI</span>
+            <span class="product-spec">HL7/DICOM</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$67,000</div>
+            <button class="product-cta" onclick="openQuote('ECG-1200')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="product-card" data-category="rehabilitacion">
+        <div class="product-img">🏃</div>
+        <div class="product-body">
+          <div class="product-category">Rehabilitación</div>
+          <div class="product-name">Camilla de Rehabilitación Eléctrica RE-500</div>
+          <div class="product-desc">Camilla eléctrica de 3 cuerpos con ajuste de altura, respaldo y piernas. Ideal para terapia física y rehabilitación.</div>
+          <div class="product-specs">
+            <span class="product-spec">3 motores</span>
+            <span class="product-spec">Carga 200kg</span>
+            <span class="product-spec">Memoria posiciones</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$38,500</div>
+            <button class="product-cta" onclick="openQuote('Camilla RE-500')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 7 -->
+      <div class="product-card" data-category="monitoreo">
+        <span class="product-badge badge-new">Nuevo</span>
+        <div class="product-img">💓</div>
+        <div class="product-body">
+          <div class="product-category">Monitoreo</div>
+          <div class="product-name">Desfibrilador Bifásico DF-200</div>
+          <div class="product-desc">Desfibrilador monitor bifásico con modo manual y AED. Pantalla de 7", registro de eventos y conectividad inalámbrica.</div>
+          <div class="product-specs">
+            <span class="product-spec">200J máx</span>
+            <span class="product-spec">Modo AED</span>
+            <span class="product-spec">ECG 12 leads</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$156,000</div>
+            <button class="product-cta" onclick="openQuote('Desfibrilador DF-200')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 8 -->
+      <div class="product-card" data-category="insumos">
+        <div class="product-img">💉</div>
+        <div class="product-body">
+          <div class="product-category">Insumos</div>
+          <div class="product-name">Jeringas Hipodérmicas Estériles (Caja 100)</div>
+          <div class="product-desc">Jeringas desechables estériles de 3 cuerpos. Aguja incluida. Volumenes: 1ml, 3ml, 5ml, 10ml, 20ml. Precio por mayoreo.</div>
+          <div class="product-specs">
+            <span class="product-spec">3 cuerpos</span>
+            <span class="product-spec">Estéril</span>
+            <span class="product-spec">ISO 7886</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">Desde $125</div>
+            <button class="product-cta" onclick="openQuote('Jeringas Hipodérmicas')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 9 -->
+      <div class="product-card" data-category="uci">
+        <div class="product-img">🩸</div>
+        <div class="product-body">
+          <div class="product-category">UCI / Emergencias</div>
+          <div class="product-name">Bomba de Infusión SmartPump 300</div>
+          <div class="product-desc">Bomba de infusión volumétrica con librería de medicamentos. Detección de burbujas y oclusión. Conectividad central.</div>
+          <div class="product-specs">
+            <span class="product-spec">0.1-1200 ml/h</span>
+            <span class="product-spec">Dosis error &lt;2%</span>
+            <span class="product-spec">WiFi/HL7</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$78,000</div>
+            <button class="product-cta" onclick="openQuote('Bomba SmartPump 300')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 10 -->
+      <div class="product-card" data-category="diagnostico">
+        <span class="product-badge badge-stock">En stock</span>
+        <div class="product-img">🔬</div>
+        <div class="product-body">
+          <div class="product-category">Diagnóstico por Imagen</div>
+          <div class="product-name">Mesa de Rayos X Digital DR-500</div>
+          <div class="product-desc">Sistema de radiografía digital con detector plano de 17x17". Tiempo de exposición &lt;0.3s. Dosis reducida para el paciente.</div>
+          <div class="product-specs">
+            <span class="product-spec">17x17" FPD</span>
+            <span class="product-spec">DICOM 3.0</span>
+            <span class="product-spec">Dosis baja</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$1,250,000</div>
+            <button class="product-cta" onclick="openQuote('Mesa Rayos X DR-500')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 11 -->
+      <div class="product-card" data-category="insumos">
+        <div class="product-img">🩹</div>
+        <div class="product-body">
+          <div class="product-category">Insumos</div>
+          <div class="product-name">Material de Curación Avanzado (Kit 50 piezas)</div>
+          <div class="product-desc">Kit completo de curación con gasas estériles, vendas elásticas, esparadrapo, solución salina y antiséptico. Para hospitales y clínicas.</div>
+          <div class="product-specs">
+            <span class="product-spec">50 piezas</span>
+            <span class="product-spec">Estéril</span>
+            <span class="product-spec">NOM-241</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$890</div>
+            <button class="product-cta" onclick="openQuote('Kit Curación')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 12 -->
+      <div class="product-card" data-category="rehabilitacion">
+        <div class="product-img">🦵</div>
+        <div class="product-body">
+          <div class="product-category">Rehabilitación</div>
+          <div class="product-name">Electroestimulador EMS-Pro 400</div>
+          <div class="product-desc">Electroestimulador de 4 canales con 40 programas predefinidos. TENS, EMS, Russian y interferencial. Pantalla táctil a color.</div>
+          <div class="product-specs">
+            <span class="product-spec">4 canales</span>
+            <span class="product-spec">40 programas</span>
+            <span class="product-spec">Táctil 5"</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">$24,500</div>
+            <button class="product-cta" onclick="openQuote('Electroestimulador EMS-Pro')">Cotizar</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="catalog-empty" id="emptyState">
+      <div class="catalog-empty-icon">🔍</div>
+      <h3>No encontramos productos</h3>
+      <p>Intenta con otra búsqueda o selecciona una categoría diferente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><div class="logo-icon" style="width:36px;height:36px;font-size:16px;">⚕</div>MediPacífico</div>
+        <p class="footer-desc">Distribuidor de equipos médicos de alta especialidad, insumos hospitalarios y servicio técnico especializado en Mazatlán, Sinaloa.</p>
+        <div class="footer-social">
+          <a href="#">f</a><a href="#">in</a><a href="#">📷</a><a href="#">▶</a>
+        </div>
+      </div>
+      <div><h4>Servicios</h4><ul class="footer-links"><li><a href="#">Mantenimiento preventivo</a></li><li><a href="#">Reparación de equipos</a></li><li><a href="#">Calibración certificada</a></li><li><a href="#">Contratos anuales</a></li></ul></div>
+      <div><h4>Productos</h4><ul class="footer-links"><li><a href="#">Diagnóstico por imagen</a></li><li><a href="#">Monitores de signos vitales</a></li><li><a href="#">UCI y emergencias</a></li><li><a href="#">Insumos y consumibles</a></li></ul></div>
+      <div><h4>Legal</h4><ul class="footer-links"><li><a href="#">Aviso de privacidad</a></li><li><a href="#">Términos de servicio</a></li><li><a href="#">Registro COFEPRIS</a></li><li><a href="#">NOM-241</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MediPacífico. Todos los derechos reservados. Mazatlán, Sinaloa · México.</span>
+      <div class="footer-cert"><span>✓ Registro COFEPRIS</span><span>✓ ISO 9001</span><span>✓ NOM-241</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/chat-widget.js"></script>
+<script>
+// Catalog filtering
+const filterBtns = document.querySelectorAll('.filter-btn');
+const productCards = document.querySelectorAll('.product-card');
+const searchInput = document.getElementById('searchInput');
+const emptyState = document.getElementById('emptyState');
+
+function filterProducts(category, searchTerm = '') {
+  let visible = 0;
+  productCards.forEach(card => {
+    const cardCategory = card.dataset.category;
+    const cardName = card.querySelector('.product-name').textContent.toLowerCase();
+    const cardDesc = card.querySelector('.product-desc').textContent.toLowerCase();
+    const matchesCategory = category === 'all' || cardCategory === category;
+    const matchesSearch = !searchTerm || cardName.includes(searchTerm) || cardDesc.includes(searchTerm);
+
+    if (matchesCategory && matchesSearch) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  emptyState.classList.toggle('show', visible === 0);
+}
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterProducts(btn.dataset.filter, searchInput.value.toLowerCase());
+  });
+});
+
+searchInput.addEventListener('input', (e) => {
+  const activeFilter = document.querySelector('.filter-btn.active');
+  filterProducts(activeFilter.dataset.filter, e.target.value.toLowerCase());
+});
+
+function openQuote(product) {
+  window.location.href = 'index.html#cotizar?producto=' + encodeURIComponent(product);
+}
+</script>
+
+</body>
+</html>

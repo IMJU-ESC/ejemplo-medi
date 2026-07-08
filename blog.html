@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Blog técnico de MediPacífico. Artículos sobre mantenimiento de equipos médicos, normativa NOM-241, guías de compra y tendencias del sector salud.">
+<title>Blog Técnico | MediPacífico — Equipos Médicos Mazatlán</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .blog-hero { padding: 140px 0 60px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); position: relative; overflow: hidden; }
+  .blog-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,180,216,0.15) 0%, transparent 70%); border-radius: 50%; }
+  .blog-hero .section-title { color: var(--white); }
+  .blog-hero .section-subtitle { color: rgba(255,255,255,0.7); }
+
+  .blog-filters { background: var(--white); padding: 20px 0; border-bottom: 1px solid var(--border); position: sticky; top: var(--header-h); z-index: 100; box-shadow: var(--shadow-sm); }
+  .blog-filters-inner { display: flex; gap: 10px; flex-wrap: wrap; }
+  .blog-filter-btn {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: inherit;
+  }
+  .blog-filter-btn:hover, .blog-filter-btn.active {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding: 48px 0;
+  }
+  .blog-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+  }
+  .blog-card.hidden { display: none; }
+  .blog-img {
+    height: 200px;
+    background: linear-gradient(135deg, var(--light) 0%, #e0f2fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-img::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(11,31,58,0.3), transparent);
+  }
+  .blog-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+    background: var(--accent);
+    color: var(--white);
+  }
+  .blog-body { padding: 24px; }
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .blog-meta span { display: flex; align-items: center; gap: 4px; }
+  .blog-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+    line-height: 1.3;
+    transition: color 0.2s;
+  }
+  .blog-card:hover .blog-title { color: var(--accent); }
+  .blog-excerpt {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .blog-read {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .featured-post {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .featured-img {
+    min-height: 360px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    position: relative;
+  }
+  .featured-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(11,31,58,0.7) 0%, rgba(0,180,216,0.2) 100%);
+  }
+  .featured-content { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+  .featured-tag {
+    display: inline-flex;
+    padding: 6px 14px;
+    background: var(--accent);
+    color: var(--white);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    width: fit-content;
+  }
+  .featured-title { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 14px; line-height: 1.2; }
+  .featured-excerpt { font-size: 15px; color: var(--text-light); line-height: 1.7; margin-bottom: 20px; }
+  .featured-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+  .newsletter-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 64px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .newsletter-section::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,180,216,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .newsletter-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .newsletter-content h3 { font-size: 28px; font-weight: 800; color: var(--white); margin-bottom: 12px; }
+  .newsletter-content p { color: rgba(255,255,255,0.7); font-size: 15px; line-height: 1.6; }
+  .newsletter-form { display: flex; gap: 12px; }
+  .newsletter-form input {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .newsletter-form input::placeholder { color: rgba(255,255,255,0.5); }
+  .newsletter-form button {
+    padding: 14px 28px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+  }
+  .newsletter-form button:hover { background: var(--accent-hover); }
+
+  @media (max-width: 1024px) {
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-post { grid-template-columns: 1fr; }
+    .featured-img { min-height: 240px; }
+    .newsletter-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .blog-grid { grid-template-columns: 1fr; }
+    .newsletter-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="preloader">
+  <div class="preloader-logo">⚕</div>
+  <div class="preloader-bar"></div>
+</div>
+
+<header class="header scrolled">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚕</div>
+      MediPacífico
+    </a>
+    <nav class="nav">
+      <a href="index.html#servicios" class="nav-link">Servicios</a>
+      <a href="catalogo.html" class="nav-link">Catálogo</a>
+      <a href="blog.html" class="nav-link active">Blog</a>
+      <a href="index.html#contacto" class="nav-link">Contacto</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://wa.me/526698765432" class="header-whatsapp" target="_blank">💬 WhatsApp</a>
+      <button class="mobile-toggle">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- Blog Hero -->
+<section class="blog-hero">
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="section-header" style="margin-bottom:0;">
+      <div class="section-label" style="background:rgba(255,255,255,0.1);color:#90E0EF;border:1px solid rgba(255,255,255,0.15);">Centro de Conocimiento</div>
+      <h2 class="section-title">Blog Técnico <span style="color:#90E0EF;">MediPacífico</span></h2>
+      <p class="section-subtitle">Artículos especializados sobre mantenimiento de equipos médicos, normativa sanitaria, guías de compra y tendencias del sector salud en México.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Filters -->
+<div class="blog-filters">
+  <div class="container blog-filters-inner">
+    <button class="blog-filter-btn active" data-filter="all">Todos los artículos</button>
+    <button class="blog-filter-btn" data-filter="mantenimiento">Mantenimiento</button>
+    <button class="blog-filter-btn" data-filter="normativa">Normativa</button>
+    <button class="blog-filter-btn" data-filter="compra">Guías de Compra</button>
+    <button class="blog-filter-btn" data-filter="tendencias">Tendencias</button>
+    <button class="blog-filter-btn" data-filter="casos">Casos de Éxito</button>
+  </div>
+</div>
+
+<!-- Featured Post -->
+<section class="section" style="padding-bottom:0;">
+  <div class="container">
+    <div class="featured-post reveal">
+      <div class="featured-img">🔧</div>
+      <div class="featured-content">
+        <div class="featured-tag">Destacado</div>
+        <h3 class="featured-title">Guía completa de mantenimiento preventivo para equipos de diagnóstico por imagen</h3>
+        <p class="featured-excerpt">El mantenimiento preventivo no solo previene averías: garantiza seguridad clínica, precisión diagnóstica y continuidad operativa. En este artículo detallamos el protocolo completo para ultrasonidos, rayos X y tomógrafos según la norma IEC 62353 y la NOM-241.</p>
+        <div class="featured-meta">
+          <span>📅 15 de julio de 2026</span>
+          <span>⏱ 12 min de lectura</span>
+          <span>👁 1,240 vistas</span>
+        </div>
+        <a href="#" class="btn btn-primary">Leer artículo completo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Grid -->
+<section class="section" style="padding-top:24px;">
+  <div class="container">
+    <div class="blog-grid" id="blogGrid">
+
+      <!-- Article 1 -->
+      <article class="blog-card reveal" data-category="mantenimiento">
+        <div class="blog-img">
+          <span class="blog-tag">Mantenimiento</span>
+          🔬
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 10 jul 2026</span>
+            <span>⏱ 8 min</span>
+          </div>
+          <h3 class="blog-title">5 señales de que tu ultrasonido necesita servicio técnico urgente</h3>
+          <p class="blog-excerpt">Identifica a tiempo los síntomas de deterioro en tu equipo de ultrasonido: artefactos en imagen, pérdida de resolución, calentamiento anormal y más.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="blog-card reveal reveal-delay-1" data-category="normativa">
+        <div class="blog-img">
+          <span class="blog-tag">Normativa</span>
+          📜
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 5 jul 2026</span>
+            <span>⏱ 10 min</span>
+          </div>
+          <h3 class="blog-title">NOM-241: Todo lo que tu hospital debe saber en 2026</h3>
+          <p class="blog-excerpt">Guía práctica sobre los requisitos de la NOM-241 para establecimientos de salud. Cumplimiento, auditorías y sanciones por incumplimiento.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="blog-card reveal reveal-delay-2" data-category="compra">
+        <div class="blog-img">
+          <span class="blog-tag">Guía de Compra</span>
+          🛒
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 28 jun 2026</span>
+            <span>⏱ 15 min</span>
+          </div>
+          <h3 class="blog-title">Cómo elegir el monitor de signos vitales ideal para tu UCI</h3>
+          <p class="blog-excerpt">Comparativa técnica de los principales monitores multiparamétricos del mercado. Parámetros, conectividad, precio y soporte post-venta.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 4 -->
+      <article class="blog-card reveal" data-category="tendencias">
+        <div class="blog-img">
+          <span class="blog-tag">Tendencias</span>
+          🤖
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 20 jun 2026</span>
+            <span>⏱ 7 min</span>
+          </div>
+          <h3 class="blog-title">Inteligencia Artificial en diagnóstico médico: el estado del arte en México</h3>
+          <p class="blog-excerpt">Cómo la IA está transformando la radiología, patología y cardiología. Casos de uso reales y regulación de dispositivos con IA en México.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 5 -->
+      <article class="blog-card reveal reveal-delay-1" data-category="casos">
+        <div class="blog-img">
+          <span class="blog-tag">Caso de Éxito</span>
+          🏥
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 15 jun 2026</span>
+            <span>⏱ 6 min</span>
+          </div>
+          <h3 class="blog-title">Cómo el Hospital del Pacífico redujo un 40% sus fallas técnicas</h3>
+          <p class="blog-excerpt">Implementación de un programa de mantenimiento preventivo con contrato anual. Resultados medibles en disponibilidad de equipos y costos operativos.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 6 -->
+      <article class="blog-card reveal reveal-delay-2" data-category="mantenimiento">
+        <div class="blog-img">
+          <span class="blog-tag">Mantenimiento</span>
+          ⚡
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 8 jun 2026</span>
+            <span>⏱ 9 min</span>
+          </div>
+          <h3 class="blog-title">Calibración de equipos médicos: frecuencia, métodos y certificación</h3>
+          <p class="blog-excerpt">Guía técnica sobre la calibración de monitores, electrocardiógrafos y equipos de laboratorio. Instrumentos certificados y trazabilidad.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 7 -->
+      <article class="blog-card reveal" data-category="compra">
+        <div class="blog-img">
+          <span class="blog-tag">Guía de Compra</span>
+          💰
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 1 jun 2026</span>
+            <span>⏱ 11 min</span>
+          </div>
+          <h3 class="blog-title">Financiamiento de equipos médicos: leasing vs. compra directa</h3>
+          <p class="blog-excerpt">Análisis comparativo de opciones de financiamiento para hospitales públicos y clínicas privadas. Ventajas fiscales y flujo de caja.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 8 -->
+      <article class="blog-card reveal reveal-delay-1" data-category="normativa">
+        <div class="blog-img">
+          <span class="blog-tag">Normativa</span>
+          📝
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 25 may 2026</span>
+            <span>⏱ 8 min</span>
+          </div>
+          <h3 class="blog-title">Registro COFEPRIS para dispositivos médicos: paso a paso</h3>
+          <p class="blog-excerpt">Proceso completo de registro sanitario ante COFEPRIS. Documentación requerida, tiempos de respuesta y costos asociados.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+      <!-- Article 9 -->
+      <article class="blog-card reveal reveal-delay-2" data-category="tendencias">
+        <div class="blog-img">
+          <span class="blog-tag">Tendencias</span>
+          🌐
+        </div>
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>📅 18 may 2026</span>
+            <span>⏱ 6 min</span>
+          </div>
+          <h3 class="blog-title">Telemedicina en México 2026: equipos necesarios y regulación</h3>
+          <p class="blog-excerpt">Los dispositivos esenciales para implementar una consulta remota de calidad. Monitores portátiles, cámaras médicas y plataformas certificadas.</p>
+          <a href="#" class="blog-read">Leer más →</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+  <div class="container newsletter-inner">
+    <div class="newsletter-content">
+      <h3>Recibe contenido técnico exclusivo</h3>
+      <p>Suscríbete a nuestro newsletter mensual con artículos sobre mantenimiento, normativa y tendencias del sector salud. Sin spam, solo valor.</p>
+    </div>
+    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('¡Gracias por suscribirte! Recibirás nuestro próximo newsletter.');">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><div class="logo-icon" style="width:36px;height:36px;font-size:16px;">⚕</div>MediPacífico</div>
+        <p class="footer-desc">Distribuidor de equipos médicos de alta especialidad, insumos hospitalarios y servicio técnico especializado en Mazatlán, Sinaloa.</p>
+        <div class="footer-social">
+          <a href="#">f</a><a href="#">in</a><a href="#">📷</a><a href="#">▶</a>
+        </div>
+      </div>
+      <div><h4>Servicios</h4><ul class="footer-links"><li><a href="#">Mantenimiento preventivo</a></li><li><a href="#">Reparación de equipos</a></li><li><a href="#">Calibración certificada</a></li><li><a href="#">Contratos anuales</a></li></ul></div>
+      <div><h4>Productos</h4><ul class="footer-links"><li><a href="#">Diagnóstico por imagen</a></li><li><a href="#">Monitores de signos vitales</a></li><li><a href="#">UCI y emergencias</a></li><li><a href="#">Insumos y consumibles</a></li></ul></div>
+      <div><h4>Legal</h4><ul class="footer-links"><li><a href="#">Aviso de privacidad</a></li><li><a href="#">Términos de servicio</a></li><li><a href="#">Registro COFEPRIS</a></li><li><a href="#">NOM-241</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MediPacífico. Todos los derechos reservados. Mazatlán, Sinaloa · México.</span>
+      <div class="footer-cert"><span>✓ Registro COFEPRIS</span><span>✓ ISO 9001</span><span>✓ NOM-241</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/chat-widget.js"></script>
+<script>
+// Blog filtering
+const blogFilterBtns = document.querySelectorAll('.blog-filter-btn');
+const blogCards = document.querySelectorAll('.blog-card');
+
+blogFilterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    blogFilterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    blogCards.forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
